@@ -8,8 +8,7 @@ import datetime
 
 from news_entry import NewsEntry
 from newsplease import NewsPlease
-from urlparse import urlparse
-
+import tldextract
 
 class NewsSpider(scrapy.Spider):
 
@@ -24,11 +23,12 @@ class NewsSpider(scrapy.Spider):
     allowed_domains = ['takvim.com.tr']
 
     def __init__(self, target="https://www.takvim.com.tr/", *args, **kwargs):
-        parsed_uri = urlparse(target)
-        domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
+        ext = tldextract.extract(target)
+        domain = '{uri.domain}.{uri.suffix}/'.format(uri=ext)
 
         self.allowed_domains.append(domain)
         self.start_urls.append(target)
+
         super(NewsSpider, self).__init__(*args, **kwargs)
 
     def parse(self, response):
