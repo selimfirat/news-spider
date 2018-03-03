@@ -24,7 +24,7 @@ class DataStorePipeline(object):
 
         # Prepares the new entity
         task = datastore.Entity(key=task_key)
-        task.__dict__.update(item.__dict__)
+        task.update(item.__dict__)
 
         # Saves the entity
         datastore_client.put(task)
