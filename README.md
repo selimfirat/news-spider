@@ -4,4 +4,4 @@ This project is currently in progress.
 ## Scrape
 * `pip install -r requirements.txt`
 * `cd scraper`
-* `scrapy crawl takvim_news`
+* `scrapy crawl news -a target="https://www.takvim.com.tr/"`

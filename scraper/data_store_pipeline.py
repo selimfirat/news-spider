@@ -24,7 +24,7 @@ class DataStorePipeline(object):
 
         # Prepares the new entity
         task = datastore.Entity(key=task_key, exclude_from_indexes=["date_publish", "date_download", "description", "text", "title"])
-        task["data"] = item
+        task.update(item)
 
         # Saves the entity
         datastore_client.put(task)
