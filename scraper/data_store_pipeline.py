@@ -1,4 +1,3 @@
-import json
 from google.cloud import datastore
 
 class DataStorePipeline(object):
@@ -24,7 +23,7 @@ class DataStorePipeline(object):
 
         # Prepares the new entity
         task = datastore.Entity(key=task_key)
-        task.update(item.__dict__)
+        task.update(item)
 
         # Saves the entity
         datastore_client.put(task)
