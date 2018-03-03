@@ -17,16 +17,16 @@ class DataStorePipeline(object):
         # The kind for the new entity
         kind = 'Article'
         # The name/ID for the new entity
-        name = item['full_url']
+        url = item['full_url']
         # The Cloud Datastore key for the new entity
-        task_key = datastore_client.key(kind, name)
+        task_key = datastore_client.key(kind, url)
+
 
         # Prepares the new entity
-        task = datastore.Entity(key=task_key)
-        task.update(item)
+        task = datastore.Entity(key=task_key, exclude_from_indexes=["date_publish", "date_download", "description", "text", "title"])
+        task["data"] = item
 
         # Saves the entity
         datastore_client.put(task)
 
-        print('Saved {}: {}'.format(task.key.name, task['title']))
         return item
