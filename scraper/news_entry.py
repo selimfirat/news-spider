@@ -2,8 +2,10 @@ from scrapy.item import Item, Field
 
 
 class NewsEntry(Item):
-    link = Field()
-    date = Field()
+    full_url = Field()
+    source_domain = Field()
+    date_publish = Field()
     title = Field()
-    content = Field()
-    category = Field()
+    description = Field()
+    date_download = Field()
+    text = Field()
