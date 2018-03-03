@@ -20,11 +20,11 @@ class NewsSpider(scrapy.Spider):
     }
 
     start_urls = []
-    allowed_domains = ['takvim.com.tr']
+    allowed_domains = []
 
     def __init__(self, target="https://www.takvim.com.tr/", *args, **kwargs):
         ext = tldextract.extract(target)
-        domain = '{uri.domain}.{uri.suffix}/'.format(uri=ext)
+        domain = '{uri.domain}.{uri.suffix}'.format(uri=ext)
 
         self.allowed_domains.append(domain)
         self.start_urls.append(target)
