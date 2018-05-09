@@ -22,12 +22,38 @@ class NewsSpider(scrapy.Spider):
     start_urls = []
     allowed_domains = []
 
-    def __init__(self, target="https://www.takvim.com.tr/", *args, **kwargs):
-        ext = tldextract.extract(target)
-        domain = '{uri.domain}.{uri.suffix}'.format(uri=ext)
+    targets = [
+        "http://aa.com.tr/",
+        "https://www.ajanshaber.com/",
+        "https://www.yenisafak.com/",
+        "http://www.turkiyegazetesi.com.tr/",
+        "http://www.star.com.tr/"
+        "https://www.ulusal.com.tr/",
+        "https://odatv.com/",
+        "http://www.oncevatan.com.tr/",
+        "http://sol.org.tr/",
+        "http://www.internethaber.com/",
+        "https://www.cnnturk.com/",
+        "https://www.sozcu.com.tr/",
+        "http://www.ensonhaber.com/",
+        "http://www.yenicaggazetesi.com.tr/",
+        "http://www.oncevatan.com.tr/",
+        "https://tr.sputniknews.com/",
+        "http://www.internethaber.com/",
+        "https://www.cnnturk.com"
+    ]
 
-        self.allowed_domains.append(domain)
-        self.start_urls.append(target)
+    def __init__(self, target=None, *args, **kwargs):
+        if target is not None:
+            targets = [target]
+
+        for target in self.targets:
+            ext = tldextract.extract(target)
+            domain = '{uri.domain}.{uri.suffix}'.format(uri=ext)
+
+
+            self.allowed_domains.append(domain)
+            self.start_urls.append(target)
 
         super(NewsSpider, self).__init__(*args, **kwargs)
 
@@ -43,7 +69,8 @@ class NewsSpider(scrapy.Spider):
                 date_download = str(now),
                 title = article.title,
                 description = article.description,
-                text = article.text
+                text = article.text,
+            #    dont_filter=True
             )
 
         for link in LxmlLinkExtractor(allow=self.allowed_domains).extract_links(response):
