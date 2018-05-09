@@ -46,7 +46,7 @@ This image demonstrates that how much space 200.000 url strings take in Python3.
 
 We needed our crawler to work continuosly without crashing.
 However, to run our crawler on the Google Cloud Compute Instance, we needed expensive Compute instances with high memory to run our crawler.
-When that was the case, we were to run out of free credits provided by Google Cloud in only 4 days:
+When that was the case, we were to run out of free credits provided by Google Cloud in only 4 days. We learned that crawling data is not so cheap.
 
 ![Crawling Attemt 1 Billing](./crawling_attempt_1_billing.PNG)
 
@@ -144,7 +144,7 @@ Our crawler has crawled 180.870 news articles in total from Mar 13, 2018, 8:30:0
 6000 tweets dataset consists of 3000 negative, 1552 positive and 1448 notr tweets.
 Test data is chosen as 20% of the dataset which is 1200. Validation splits are chosen as 20% of training set which are 960 tweets each.
 
-The dataset is obtained from
+The dataset is obtained from https://github.com/sercankulcu/twitterdata [19].
 
 ## 35000 Sentences Named Entity Recognition Dataset
 
@@ -214,17 +214,22 @@ Turkish is a morphologically rich and an agglutinative language. In such languag
 #### Logistic Regression Algorithm
 
 ![](./logistic_regression.png)
-In logistic regression
+
+In logistic regression, the feature vector is multiplied with the transpose of normal vector of the fitting line. Then, a non-linearity which is the sigmoid function is applied to that result.
 
 ![](./logistic_regression_sigmoid.png)
 
 Since logistic regression function is continuous, it can easily be optimized via calculating and moving towards its gradient.
 
+##### Stochastic Gradient Descent
+
+Normal vector of fitting line is moved at each iteration of introducing samples.
 
 ![](./sigmoid_derivation.png)
-
+The derivative of sum of multiplication of w transpose and x vectors are appended to that by the chain rule.
 
 ![](./sgd.png)
+Here, L loss function is L2, namely the sum of square of distances between actual values and estimates.
 
 #### Running via Apache Beam Mapreduce
 ![Sentiment Analysis](./sentiment_mapreduce.png)
@@ -248,6 +253,7 @@ To research this issue, we compared with popular Turkish NLP tools for normaliza
 ![Normalization Comparison](./normalization_comparison.png) [8]
 
 These results do not indicate any problem with the library we use(Turkish Text Normalizer (With NLTK)).
+Thuss, we believe that normalization removes some information about sentiments. However, for our task we will apply normalization because normalized tweets are obviously more like the news data.
 
 ###### Sentence Tokenization
 Sentence tokenization is simply the separating different sentences in a text from each other. In medium-sized writings such as news articles, sentences are usually seperated with dots. However, there are many abbreviations that use dot (.) to indicate abbreviation in Turkish language.
@@ -281,10 +287,13 @@ TF-IDF is an information retrieval technique that measures the relative importan
 
 TF-IDFs are useful on retrieving the tokens that determine the context of a particular text as well as eliminating stop words.
 
+Below is the mapreduce implementation of tf-idf:
+
 ![tf-idf-mapreduce](./tfidf_mapreduce.PNG)
 
 Here, we tried to run via dataflow but some steps seems failed since the error caused by word2vec related stuff. In fact, later we switched to Google Cloud Compute Instance to run Mapreduce implementation of TF-IDF.Note: Apache beam redirects some steps to the disks only when it is required. Thus, there is not much difference between map step and yielding foreach loop in redundant mappings. Reactive programming style is used to improve the quality and understandibility of the implementation.
 
+Note: Apache beam redirects some steps to the disks only when it is required. Thus, there is not much difference between map step and yielding foreach loop in redundant mappings. Reactive programming style is used to improve the quality and understandibility of the implementation.
 
 
 ###### Word2vec
@@ -293,7 +302,7 @@ The matrices we obtained for bag of words and tf-idf are very sparse. For exampl
 It is not possible to classify out-of-vocabulary words using bag-of-words and tf-idf features. We can decrease the out-of-vocabulary words in any text via stemming and normalization.
 However, a real solution to this problem is using pre-trained Word2Vec models as nearly all researchers do.
 
-Thus, we prefered to switch Word2Vec model [14] pretrained on 800k words wikipedia data.
+Thus, we prefered to switch Word2Vec model [14] pre-trained on 800k words wikipedia data.
 This provides us much larger corpus containing 800000.
 
 #### Experimentation Methodology
@@ -305,6 +314,8 @@ To make experiments on, 6000 tweets dataset is used. We first made experiments u
 High precision means most of the items classified as a label, this label is most probably the correct one.
 
 High recall means most of the items that needed to be labelled are labelled correctly.
+
+The only reason why we use the harmonic mean is because we're taking the average of ratios (percentages), and in that case the harmonic mean is more appropriate than the arithmetic mean.
 
 
 To compare our results with state-of-art results, we needed to use F1 scores as is in these research papers.
@@ -319,16 +330,24 @@ In our classifications, for each class, the true positive, true negative, false 
 
 ![3 Class Sentiment](./3class_sentiment.PNG)
 
+These models are biased over negative tweets to increase their accuracy. Negative tweets are easier to classify for all type of classifiers whereas notr tweets are the hardest to classify.
+
 We get most accurate results with SVM and logistic regression. However, SVM is too slow to be work on larger data such as our news dataset.
+
 
 Thus, we chose to implement Logistic Regression using numpy matrix computation library [7].
 Below is the logistic regression experimentation results
 
 
-
 ![2 Class Sentiment](./2class_sentiment.PNG)
 
+Here, perceptron classifier is the name for logistic regression classifier in neural networks literature.
+Although we get highest scores with Bag-of-words model, we do not use it in production. Because it requires more memory and time consuming computations than Word2Vec model.
+
+
+
 #### Related Work
+There are not many work done in this area.  Kaya et. al. [5] made many experiments on political news 82.01 F1 score at best. However, our results are not comparable with theirs.
 
 #### Future Work
 There is definitely lack of labeled data on news articles for sentiment analysis. Labeling new datasets for Turkish news context would be the best contribution to the field.
@@ -338,15 +357,95 @@ This process would also help for generalization of the sentiment classification 
 
 ## Named Entity Recognition
 
+#### Task Definition
+In this task we want to classify named entities.
+
+Sequence to sequence labeling is a common problem in Natural Language Processing literature.
+
+#### Character Embeddings
+One-hot character vectors are converted to distributed representation of characters. Embeddings are learned during training of the network.
+This is simply a dense layer of neurons wi
+
+#### LSTM
+Recurrent neural networks(RNNs) achieved state-of-art results in many languages. However, original RNNs are One type of them are Long Short Term Memory which is originally created to overcome exploding gradient problem during training.
+
+In LSTM cells, the following equations are defined:
+
+![Softmax](./lstm.PNG)
+
+Left hand sides of these equations are called forget gate, input gate, output gate, cell vector, and hidden state vector, respectively.
+
+σ is the sigmoid function. Uppercase W letters are matrices, indicating weights subscripted with target and , respectively.
+These equations can be optimized via stochastic gradient descent we described in Sentiment Classification section.
+
+#### Bidirectional LSTM
+Success of Bidirectional LSTMs in NER tasks show that being a named entity depends on future character sequences as well as future character sequences.
+Simply, bi-directional LSTMs are the way to consider future LSTM sequences.
+
+#### Softmax
+We have labels which PERSON, ORGANIZATION, LOCATION, and NONE. This is why the last dimension of softmax layer is 4.
+For each label, we want to assign a probability to that label. In this case, we replace an activation function such as logistic function with softmax function.
+
+![Softmax](./softmax.png)
+
+#### Our Architecture
+
+![CharNER](./architecture.png)
+
+Nones in model plot indicate variable lengths.
+
+Character embeddings are connected to stacked 3 bidirectional lstm layers and at the end Softmax layer gives the probabilities of sequence of named entities for the words of sentence.
+
+```
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+embedding_1 (Embedding)      (None, None, 30)          900
+_________________________________________________________________
+dropout_1 (Dropout)          (None, None, 30)          0
+_________________________________________________________________
+bidirectional_1 (Bidirection (None, None, 200)         104800
+_________________________________________________________________
+bidirectional_2 (Bidirection (None, None, 150)         165600
+_________________________________________________________________
+bidirectional_3 (Bidirection (None, None, 100)         80400
+_________________________________________________________________
+dropout_2 (Dropout)          (None, None, 100)         0
+_________________________________________________________________
+time_distributed_1 (TimeDist (None, None, 4)           404
+=================================================================
+Total params: 352,104
+Trainable params: 352,104
+Non-trainable params: 0
+_________________________________________________________________
+```
+
+#### Experimentation Methodology
+Since the network is time consuming to train, we could not make many experiments. However, Kuru et al. [20] achieves state-of-art results with similar neural network architecture.
+We implemented similar neural network to and experimented on same dataset as Kuru et al. []
+
+To make experiments 35000 sentences NER dataset
+![F1](./f1_1.PNG)
+High precision means most of the items classified as a label, this label is most probably the correct one.
+
+High recall means most of the items that needed to be labelled are labelled correctly.
+
+The only reason why we use the harmonic mean is because we're taking the average of ratios (percentages), and in that case the harmonic mean is more appropriate than the arithmetic mean.
+
+
+To compare our results with state-of-art results, we needed to use F1 scores as is in these research papers.
+
+
+#### Experimentation Results
+
 
 #### Related Work
 
 
 #### Future Work
-
+Viterbi decoder, or Random Forest, or SVMs can be used after softmax layer. In published paper of Kuru et al. [20], they use Viterbi decoder to make some rule based decisions. For example, the continuation of a named entity cannot be at the beginning of that named entity. This decoder increases the F1 scores by ~2% as they indicate.
 
 # Technologies & Environment
-
 * Language: Python 3.5.4 & Python 2.7 (For Apache Beam & Google Cloud Dataflow)
 * Environment: Anaconda 4.4.7
 * Jupyter Notebook [18]
@@ -365,6 +464,10 @@ Kaya et. al. [5] states that as a future work, determining which columnists writ
 
 
 # Future Work
+Initially, our plan was to build real time version of this project. Apache beam is also capable of working on data streams such as stream of news like ours.
+In order to build that kind of architecture Google Cloud Pub/Sub can be used. When a new item is written to Google Cloud Datastore, a new event is published. Then, apache beam runners listens that event and indexes these results to the ElasticSearch to be visualized by Kibana.
+
+# Work Distribution
 
 
 # Conclusion
@@ -382,7 +485,7 @@ Kaya et. al. [5] states that as a future work, determining which columnists writ
 
 [5] Kaya, M., Fidan, G., & Toroslu, I. H. (2012, December). Sentiment analysis of turkish political news. In Proceedings of the The 2012 IEEE/WIC/ACM International Joint Conferences on Web Intelligence and Intelligent Agent Technology-Volume 01 (pp. 174-180). IEEE Computer Society.
 
-[6] Cournapeau, D. (2015). Sci-kit Learn. Machine Learning in Python. online,[cit. 8.5. 2017]. URL http://scikit-learn. org.
+[6] Cournapeau, D. (2015). Sci-kit Learn. Machine Learning in Python. online,[cit. 8.5. 2017]. URL http://scikit-learn.org.
 
 [7] Walt, S. V. D., Colbert, S. C., & Varoquaux, G. (2011). The NumPy array: a structure for efficient numerical computation. Computing in Science & Engineering, 13(2), 22-30.
 
@@ -407,3 +510,7 @@ Kaya et. al. [5] states that as a future work, determining which columnists writ
 [17] Chollet, F. (2015). Keras.
 
 [18] Kluyver, T., Ragan-Kelley, B., Pérez, F., Granger, B. E., Bussonnier, M., Frederic, J., ... & Ivanov, P. (2016, May). Jupyter Notebooks-a publishing format for reproducible computational workflows. In ELPUB (pp. 87-90).
+
+[19] https://github.com/sercankulcu/twitterdata
+
+[20] Kuru, O., Can, O. A., & Yuret, D. (2016). Charner: Character-level named entity recognition. In Proceedings of COLING 2016, the 26th International Conference on Computational Linguistics: Technical Papers (pp. 911-921).
