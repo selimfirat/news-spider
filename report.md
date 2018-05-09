@@ -250,7 +250,7 @@ To normalize turkish tweets in our 6000 tweets dataset, we use Turkish Tweet Nor
 As we see no improvement on validation step when tweets are normalized, we wondered whether our text normalizer.
 To research this issue, we compared with popular Turkish NLP tools for normalization which are Zemberek3 [9] and ITU Normalization Service [10] as following:
 
-![Normalization Comparison](./normalization_comparison.png) [8]
+![Normalization Comparison](./normalization_comparison.PNG) [8]
 
 These results do not indicate any problem with the library we use(Turkish Text Normalizer (With NLTK)).
 Thuss, we believe that normalization removes some information about sentiments. However, for our task we will apply normalization because normalized tweets are obviously more like the news data.
@@ -358,15 +358,19 @@ This process would also help for generalization of the sentiment classification 
 ## Named Entity Recognition
 
 #### Task Definition
-In this task we want to classify named entities.
+Named entity recognition is the extraction of named entities from the text.
 
 Sequence to sequence labeling is a common problem in Natural Language Processing literature. Named entities are real world object with proper names such as people, locations, organizations.
 
-Named entity recognition is challenging task. Named entities can be defined differently in different human labelers. Also, substrings of some named entity may also be another named entity. For example, "Mustafa Kemal Caddesi" is
+Named entity recognition is challenging task. Named entities can be defined differently in different human labelers. Also, substrings of some named entity may also be another named entity. For example, "Mustafa Kemal Caddesi" is a location whereas "Mustafa Kemal" is a person.
+Also, context awareness is required since "İpek" may be a person name as well as a product name.
+
+For NER Task we implement a similar architecture to the one proposed by Kuru et al. [20] which is discussed in Related Work section of NER.
+In this project, we only extract PERSON, LOCATION, ORGANIZATION named entities.
 
 #### Character Embeddings
 One-hot character vectors are converted to distributed representation of characters. Embeddings are learned during training of the network.
-This is simply a dense layer of neurons wi
+This is simply a dense layer of neurons that learn the distributed representation of characters. This kind of embedding would highly reduce data sparsity
 
 #### LSTM
 Recurrent neural networks(RNNs) achieved state-of-art results in many languages. However, original RNNs are One type of them are Long Short Term Memory which is originally created to overcome exploding gradient problem during training.
@@ -426,8 +430,10 @@ _________________________________________________________________
 Since the network is time consuming to train, we could not make many experiments. However, Kuru et al. [20] achieves state-of-art results with similar neural network architecture.
 We implemented similar neural network to and experimented on same dataset as Kuru et al. []
 
-To make experiments 35000 sentences NER dataset
-![F1](./f1_1.PNG)
+We made experiments on 35000 sentences Named Entity Recognition Dataset.
+
+![F1](./f1_2.PNG)
+
 High precision means most of the items classified as a label, this label is most probably the correct one.
 
 High recall means most of the items that needed to be labelled are labelled correctly.
@@ -440,8 +446,12 @@ To compare our results with state-of-art results, we needed to use F1 scores as 
 
 #### Experimentation Results
 
+We could not exactly reproduce the results in CharNER [20] architecture probably because we do not have Viterbi decoder. However, we obtained significant results for Named Entity Recognition.
+
 
 #### Related Work
+In CharNER architecture proposed by Kuru et al. [20], they mapped each character to a label. Then, they extracted the most probable Named Entity sequence for words of the sentence from these labels via Viterbi Decoder.
+In our implementation we used a softmax layer instead of the Viterbi decoder. As Kuru et al. [20] discusses we got lower results than the CharNER implementation proposed by them.
 
 
 #### Future Work
@@ -463,7 +473,6 @@ Viterbi decoder, or Random Forest, or SVMs can be used after softmax layer. In p
 
 # Related Work
 Kaya et. al. [5] states that as a future work, determining which columnists write about which party/person and determine their sentiment(supportive or criticisive behavior). This is what we did in this project.
-
 
 # Future Work
 Initially, our plan was to build real time version of this project. Apache beam is also capable of working on data streams such as stream of news like ours.
