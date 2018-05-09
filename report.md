@@ -243,7 +243,7 @@ Tweets are much more informal than news articles mostly written by individuals, 
 
 The normalization example for the tweet "@dida what’s up, why don’t you call #offended :(" is below:
 
-![Normalization Definition](./normalization_def.png) [8]
+![Normalization Definition](./normalization_def.PNG) [8]
 
 To normalize turkish tweets in our 6000 tweets dataset, we use Turkish Tweet Normalizer library [11].
 
@@ -309,7 +309,7 @@ This provides us much larger corpus containing 800000.
 To make experiments on, 6000 tweets dataset is used. We first made experiments using sklearn [6] library in order to be sure about the implementations we tested are correct and easily validate them. Later, we implement the best fitting model in matrix library numpy [7] and try to get same results with this.Decision tree, logistic regression, nearest neighbor, SVM classifiers are evaluated on this dataset using SKLearn library.
 
 
-![F1](./f1_1.PNG)
+![F1](./f1_1.png)
 
 High precision means most of the items classified as a label, this label is most probably the correct one.
 
@@ -360,7 +360,9 @@ This process would also help for generalization of the sentiment classification 
 #### Task Definition
 In this task we want to classify named entities.
 
-Sequence to sequence labeling is a common problem in Natural Language Processing literature.
+Sequence to sequence labeling is a common problem in Natural Language Processing literature. Named entities are real world object with proper names such as people, locations, organizations.
+
+Named entity recognition is challenging task. Named entities can be defined differently in different human labelers. Also, substrings of some named entity may also be another named entity. For example, "Mustafa Kemal Caddesi" is
 
 #### Character Embeddings
 One-hot character vectors are converted to distributed representation of characters. Embeddings are learned during training of the network.
