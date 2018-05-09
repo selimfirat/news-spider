@@ -147,8 +147,15 @@ Test data is chosen as 20% of the dataset which is 1200. Validation splits are c
 The dataset is obtained from https://github.com/sercankulcu/twitterdata [19].
 
 ## 35000 Sentences Named Entity Recognition Dataset
+Dataset is created by Tür et al. [21] containing 35000 sentences labeled with PERSON, ORGANIZATION, and LOCATION.
 
+This dataset contains 30000 training sentences, 2237 validation sentences, 3336 test sentences.
 
+Below is the sample from this dataset:
+
+![NER Data Sample](./ner_data_sample.PNG)
+
+Here "B-" indicates beginning of the named entity and "I-" indicates continuation of the named entity began before.
 
 # Algorithms
 
@@ -428,7 +435,7 @@ _________________________________________________________________
 
 #### Experimentation Methodology
 Since the network is time consuming to train, we could not make many experiments. However, Kuru et al. [20] achieves state-of-art results with similar neural network architecture.
-We implemented similar neural network to and experimented on same dataset as Kuru et al. []
+We implemented similar neural network to and experimented on same dataset as Kuru et al. [20]
 
 We made experiments on 35000 sentences Named Entity Recognition Dataset.
 
@@ -471,14 +478,16 @@ Viterbi decoder, or Random Forest, or SVMs can be used after softmax layer. In p
 * keras [17]
 
 
-# Related Work
+# Some Discussions
+
+## Related Work
 Kaya et. al. [5] states that as a future work, determining which columnists write about which party/person and determine their sentiment(supportive or criticisive behavior). This is what we did in this project.
 
-# Future Work
+## Future Work
 Initially, our plan was to build real time version of this project. Apache beam is also capable of working on data streams such as stream of news like ours.
 In order to build that kind of architecture Google Cloud Pub/Sub can be used. When a new item is written to Google Cloud Datastore, a new event is published. Then, apache beam runners listens that event and indexes these results to the ElasticSearch to be visualized by Kibana.
 
-# Work Distribution
+## Work Distribution
 
 
 # Conclusion
@@ -525,3 +534,6 @@ In order to build that kind of architecture Google Cloud Pub/Sub can be used. Wh
 [19] https://github.com/sercankulcu/twitterdata
 
 [20] Kuru, O., Can, O. A., & Yuret, D. (2016). Charner: Character-level named entity recognition. In Proceedings of COLING 2016, the 26th International Conference on Computational Linguistics: Technical Papers (pp. 911-921).
+
+[21] Gökhan Tür, Dilek Hakkani-Tür, and Kemal Oflazer. 2003. A statistical information extraction system for turkish.
+Natural Language Engineering, 9(02):181–210.
