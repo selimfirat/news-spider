@@ -455,6 +455,10 @@ To compare our results with state-of-art results, we needed to use F1 scores as 
 
 We could not exactly reproduce the results in CharNER [20] architecture probably because we do not have Viterbi decoder. However, we obtained significant results for Named Entity Recognition.
 
+Training is stopped at 89.61 F1 score on validation set
+When we test that model on test dataset F1 is 82.37.
+
+Lower than original implementation of CharNER [20] which is 91.30 but seems sensible for our project. Nevertheless, the reasons for that result are discussed in "Related Work" section below.
 
 #### Related Work
 In CharNER architecture proposed by Kuru et al. [20], they mapped each character to a label. Then, they extracted the most probable Named Entity sequence for words of the sentence from these labels via Viterbi Decoder.
