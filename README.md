@@ -1,5 +1,4 @@
-# Turkish News Sentiment Analysis
-This project is currently in progress.
+# Turkish News Spider
 
 ## Scrape
 * `pip install -r requirements.txt`
